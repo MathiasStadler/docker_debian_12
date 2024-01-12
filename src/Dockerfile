@@ -46,7 +46,7 @@ RUN echo "user ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/"$USER" \
     && chmod 0440 /etc/sudoers.d/"$USER"
 #set dbus for user 
 RUN echo "export XDG_RUNTIME_DIR=/run/user/$(id -u ${USER})" > /home/${USER}/.bashrc && \
-    echo "export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"" >> /home/${USER}/.bashrc
+    echo "export DBUS_SESSION_BUS_ADDRESS=\"unix:path=$XDG_RUNTIME_DIR/bus\"" >> /home/${USER}/.bashrc
 
 # install dbus
 #FROM HERE https://github.com/mviereck/x11docker/issues/229
