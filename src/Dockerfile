@@ -66,7 +66,7 @@ COPY /bootstrap.sh /opt
 COPY docker-dbus-entrypoint.sh /opt
 
 # clean up
-RUN apt-get autoremove -y \
+RUN apt-get autoremove --auto-remove -y \
     && apt-get clean -y \
     && apt-get autoclean -y \
     && rm -rf /var/lib/apt/lists/*
