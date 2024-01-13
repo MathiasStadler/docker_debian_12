@@ -98,14 +98,16 @@ RUN mkdir -p /opt
 COPY /bootstrap.sh /opt
 
 # copy docker-entrypoint
-COPY docker-dbus-entrypoint.sh /optdocker buildx build --progress=plain -t debian_12_google_chrome -f Dockerfile "."
+COPY docker-dbus-entrypoint.sh /opt
 
 
 # clean up
-RUN apt-get autoremove --auto-remove -y \
+RUN apt-get autoremove --purge --auto-remove -y \
     && apt-get clean -y \
     && apt-get autoclean -y \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/* \
+    && rm -rf /var/tmp/*
 
 RUN chmod +x /opt//docker-dbus-entrypoint.sh
 ENTRYPOINT ["/opt/docker-dbus-entrypoint.sh"]
