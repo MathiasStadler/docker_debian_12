@@ -1,3 +1,21 @@
+# Run Chrome in a container
+#
+# docker run -it \
+#   --net host \ # may as well YOLO
+#   --cpuset-cpus 0 \ # control the cpu
+#   --memory 512mb \ # max memory it can use
+#   -v /tmp/.X11-unix:/tmp/.X11-unix \ # mount the X11 socket
+#   -e DISPLAY=unix$DISPLAY \
+#   -v $HOME/Downloads:/home/chrome/Downloads \
+#   -v $HOME/.config/google-chrome/:/data \ # if you want to save state
+#   --security-opt seccomp=$HOME/chrome.json \
+#   --device /dev/snd \ # so we have sound
+#   --device /dev/dri \
+#   -v /dev/shm:/dev/shm \
+#   --name chrome \
+#   debian_12_google_chrome
+
+
 FROM debian:stable-slim
 
 
@@ -16,7 +34,23 @@ RUN apt -y  install xvfb \
     dbus-x11 \
     dbus-user-session \ 
     mesa-utils \
-    mesa-utils-extra
+    mesa-utils-extra \
+    libcanberra-gtk* \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg \
+    hicolor-icon-theme \
+    libgl1-mesa-dri \
+    libgl1-mesa-glx \
+    libpango1.0-0 \
+    libpulse0 \
+    libv4l-0 \
+    fonts-symbola \
+    systemd
+# --no-install-recommends
+
+
 
 
 # install google-chrome from here
@@ -26,8 +60,8 @@ RUN apt -y  install xvfb \
 RUN curl -fSsL https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor | sudo tee /usr/share/keyrings/google-chrome.gpg >> /dev/null
 RUN echo deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main | sudo tee /etc/apt/sources.list.d/google-chrome.list
 RUN apt update
-RUN apt -yqq install google-chrome-stable
-
+RUN apt -yqq install google-chrome-stable 
+# --no-install-recommends
 
 #create user
 # Environment variables for user
@@ -35,7 +69,8 @@ ENV PUID='1001'
 ENV PGID='1001'
 ENV USER='user'
 
-# create user $USER
+# create user $USERdocker buildx build --progress=plain -t debian_12_google_chrome -f Dockerfile "."
+
 RUN groupadd --gid "$PGID" "$USER" 
 RUN useradd --home-dir /home/$USER --shell /bin/bash --uid "$PUID" --gid "$PGID" "$USER" 
 # RUN echo $USER | passwd --stdin $USER
@@ -63,7 +98,8 @@ RUN mkdir -p /opt
 COPY /bootstrap.sh /opt
 
 # copy docker-entrypoint
-COPY docker-dbus-entrypoint.sh /opt
+COPY docker-dbus-entrypoint.sh /optdocker buildx build --progress=plain -t debian_12_google_chrome -f Dockerfile "."
+
 
 # clean up
 RUN apt-get autoremove --auto-remove -y \
@@ -75,11 +111,11 @@ RUN chmod +x /opt//docker-dbus-entrypoint.sh
 ENTRYPOINT ["/opt/docker-dbus-entrypoint.sh"]
 
 
-# docker buildx build --progress=plain -t debian_12 -f Dockerfile "."
+# docker buildx build --progress=plain -t debian_12_google_chrome -f Dockerfile "."
 
-# docker run -it debian_12 bash
+# docker run -it debian_12_google_chrome bash
 
-# docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run debian_12 bash
+# docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run debian_12_google_chrome bash
 
 # overwrite entrypoint
-# docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run  --entrypoint bash debian_12
+# docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run  --entrypoint bash debian_12_google_chrome

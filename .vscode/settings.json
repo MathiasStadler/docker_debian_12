@@ -1,5 +1,17 @@
 {
     "cSpell.words": [
+        "capget",
+        "capset",
+        "creat",
+        "epoll",
+        "eventfd",
+        "eventfd2",
+        "getres",
+        "gettime",
+        "nanosleep",
+        "prctl",
+        "pwait",
+        "SCMP",
         "vncviewer"
     ]
 }
