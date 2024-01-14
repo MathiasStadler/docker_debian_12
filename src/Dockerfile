@@ -16,8 +16,8 @@
 #   debian_12_google_chrome
 
 
-FROM debian:stable-slim
-
+# FROM debian:stable-slim
+FROM debian:12.4
 
 RUN apt -y  --fix-missing update
 RUN apt -y  --fix-missing upgrade
@@ -47,7 +47,9 @@ RUN apt -y  install xvfb \
     libpulse0 \
     libv4l-0 \
     fonts-symbola \
-    systemd
+    systemd \
+    bash \
+    vim
 # --no-install-recommends
 
 
@@ -112,7 +114,6 @@ RUN apt-get autoremove --purge --auto-remove -y \
 RUN chmod +x /opt//docker-dbus-entrypoint.sh
 ENTRYPOINT ["/opt/docker-dbus-entrypoint.sh"]
 
-
 # docker buildx build --progress=plain -t debian_12_google_chrome -f Dockerfile "."
 
 # docker run -it debian_12_google_chrome bash
@@ -121,3 +122,9 @@ ENTRYPOINT ["/opt/docker-dbus-entrypoint.sh"]
 
 # overwrite entrypoint
 # docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run  --entrypoint bash debian_12_google_chrome
+
+# /w dri
+# docker run -it --net host --cpuset-cpus 0 --memory 512mb -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY -v $HOME/Downloads:/home/chrome/Downloads -v $HOME/.config/google-chrome/:/data --security-opt seccomp=$HOME/chrome.json --device /dev/snd --device /dev/dri -v /dev/shm:/dev/shm --name chrome --entrypoint bash debian_12_google_chrome
+
+# /w --tmpfs /run
+# docker run -it --net host --cpuset-cpus 0 --memory 512mb -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY -v $HOME/Downloads:/home/chrome/Downloads -v $HOME/.config/google-chrome/:/data --security-opt seccomp=$HOME/chrome.json --device /dev/snd --device /dev/dri -v /dev/shm:/dev/shm --tmpfs /run --name chrome --entrypoint bash debian_12_google_chrome
