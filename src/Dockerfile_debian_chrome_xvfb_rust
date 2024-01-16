@@ -120,7 +120,7 @@ RUN set -eux; \
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH \
-    RUST_VERSION=1.74.1
+    RUST_VERSION=1.74.2
 
 RUN set -eux; \
     dpkgArch="$(dpkg --print-architecture)"; \
@@ -141,9 +141,6 @@ RUN set -eux; \
     rustup --version; \
     cargo --version; \
     rustc --version; \
-    apt-get remove -y --auto-remove \
-    wget \
-    ; \
     rm -rf ls ;
 
 # Add chrome user
@@ -211,11 +208,11 @@ RUN apt-get autoremove -y-y --auto-remove  && \
     libvulkan1 \   
     libwayland-client0 \
     libxcomposite1 \
-    libxdamage      
-wget \
+    libxdamage-dev \      
+    wget 
 
-    # copy docker-entrypoint
-    COPY bootstrap.sh docker-dbus-entrypoint.sh  opt/
+# copy docker-entrypoint
+COPY bootstrap.sh docker-dbus-entrypoint.sh  opt/
 
 
 #OLD  copy docker-entrypoint
