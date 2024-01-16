@@ -7,7 +7,7 @@ SHELL ["/bin/bash","-cx"]
 RUN echo 'root:root' | chpasswd
 
 
-RUN printf '#!/bin/sh\nexit 0' > /usr/sbin/policy-rc.d
+RUN printf '#!/bin/sh\n exit 0' > /usr/sbin/policy-rc.d
 
 # set user
 # Environment variables for user
@@ -37,6 +37,84 @@ RUN echo "export XDG_RUNTIME_DIR=/run/user/$(id -u ${USER})" > /home/${USER}/.ba
 #-no-install-recommends --no-install-suggests install
 
 
+
+
+# Chrome dependency Instalation \
+# FROM HERE - https://github.com/Dmitry-Ostashev/testcafe-kubernetes-example/blob/main/Dockerfile \
+
+# add chrome
+# FROM HERE
+# https://github.com/mviereck/x11docker/issues/229
+
+# install DBUS
+# FROM HERE
+# https://github.com/mviereck/x11docker/issues/229
+RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests -yqq adduser \
+    apt-transport-https \
+    bash \   
+    ca-certificates \
+    curl \    
+    dbus \                   
+    dbus-user-session \
+    dbus-x11 \           
+    fluxbox \ 
+    fonts-liberation \
+    gcc \                   
+    hicolor-icon-theme \
+    htop \       
+    libasound2 \          
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \           
+    libatspi2.0-0 \
+    libc6-dev \     
+    libcanberra-gtk-module  \
+    libcups2 \       
+    libdbus-1-3 \      
+    libdrm2 \                    
+    libgbm1 \     
+    libgl1-mesa-dri \
+    libgtk-3-0 \ 
+    libnspr4 \   
+    libnss3 \            
+    libpango1.0-0 \ 
+    libpulse0 \   
+    libu2f-udev \
+    libv4l-0 \         
+    libvulkan1 \   
+    libwayland-client0 \
+    libxcomposite1 \
+    libxdamage-dev \
+    wget 
+
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH \
+    RUST_VERSION=1.74.1
+
+RUN set -eux; \
+    dpkgArch="$(dpkg --print-architecture)"; \
+    case "${dpkgArch##*-}" in \
+    amd64) rustArch='x86_64-unknown-linux-gnu'; rustupSha256='0b2f6c8f85a3d02fde2efc0ced4657869d73fccfce59defb4e8d29233116e6db' ;; \
+    armhf) rustArch='armv7-unknown-linux-gnueabihf'; rustupSha256='f21c44b01678c645d8fbba1e55e4180a01ac5af2d38bcbd14aa665e0d96ed69a' ;; \
+    arm64) rustArch='aarch64-unknown-linux-gnu'; rustupSha256='673e336c81c65e6b16dcdede33f4cc9ed0f08bde1dbe7a935f113605292dc800' ;; \
+    i386) rustArch='i686-unknown-linux-gnu'; rustupSha256='e7b0f47557c1afcd86939b118cbcf7fb95a5d1d917bdd355157b63ca00fc4333' ;; \
+    *) echo >&2 "unsupported architecture: ${dpkgArch}"; exit 1 ;; \
+    esac; \
+    url="https://static.rust-lang.org/rustup/archive/1.26.0/${rustArch}/rustup-init"; \
+    wget "$url"; \
+    echo "${rustupSha256} *rustup-init" | sha256sum -c -; \
+    chmod +x rustup-init; \
+    ./rustup-init -y --no-modify-path --profile minimal --default-toolchain $RUST_VERSION --default-host ${rustArch}; \
+    rm rustup-init; \
+    chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
+    rustup --version; \
+    cargo --version; \
+    rustc --version; \
+    apt-get remove -y --auto-remove \
+    wget \
+    ; \
+    rm -rf ls 
+
 #install rust
 
 ENV RUSTUP_HOME=/usr/local/rustup \
@@ -45,13 +123,6 @@ ENV RUSTUP_HOME=/usr/local/rustup \
     RUST_VERSION=1.74.1
 
 RUN set -eux; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends \
-    ca-certificates \
-    gcc \
-    libc6-dev \
-    wget \
-    ; \
     dpkgArch="$(dpkg --print-architecture)"; \
     case "${dpkgArch##*-}" in \
     amd64) rustArch='x86_64-unknown-linux-gnu'; rustupSha256='0b2f6c8f85a3d02fde2efc0ced4657869d73fccfce59defb4e8d29233116e6db' ;; \
@@ -75,109 +146,25 @@ RUN set -eux; \
     ; \
     rm -rf ls ;
 
-# Chrome dependency Instalation \
-# FROM HERE - https://github.com/Dmitry-Ostashev/testcafe-kubernetes-example/blob/main/Dockerfile \
-
-# add chrome
-# FROM HERE
-# https://github.com/mviereck/x11docker/issues/229
-
-# install DBUS
-# FROM HERE
-# https://github.com/mviereck/x11docker/issues/229
-RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests -yqq systemd \
-    systemd-sysv \
-    dbus \
-    dbus-x11 \
-    dbus-user-session \ 
-    mesa-utils \
-    mesa-utils-extra \
-    xvfb \
-    apt-transport-https \
-    adduser \
-    x11vnc \
-    bash \
-    vim \
-    htop \
-    sudo \
-    fluxbox \
-    x11-utils # for xdpyinfo \
-    bash \
-    vim \
-    terminus-font \
-    curl \
-    wget \
-    ca-certificates \
-    unzip \
-    fonts-liberation \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libatspi2.0-0 \
-    libcups2 \
-    libdbus-1-3 \
-    libdrm2 \
-    libgbm1 \
-    libgtk-3-0 \
-    libnspr4 \
-    libnss3 \
-    libwayland-client0 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxfixes3 \
-    libxkbcommon0 \
-    libxrandr2 \
-    xdg-utils \
-    libu2f-udev \
-    libvulkan1 \
-    gcc \
-    libv4l-0 \
-    apt-transport-https \
-    ca-certificates \
-    locales \
-    locales-all \
-    hicolor-icon-theme \
-    dbus-x11 \
-    mesa-utils \
-    mesa-utils-extra \
-    xpra \
-    websockify \
-    upower \
-    libgl1-mesa-dri \
-    libpango1.0-0 \
-    libpulse0 \
-    libv4l-0 \
-    libcanberra-gtk-module  \
-    sssd \
-    sssd-dbus \
-    unzip
-
-
 # Add chrome user
-RUN groupadd -r chrome && useradd -r -g chrome  chrome \
-    && mkdir -p /home/chrome/Downloads && chown -R chrome:chrome /home/chrome
+RUN groupadd -r chrome && \
+    useradd -r -g chrome  chrome && \
+    mkdir -p /home/chrome/Downloads && \
+    chown -R chrome:chrome /home/chrome
 
 # for chrome FROM HERE
 # https://stackoverflow.com/questions/71571296/can-i-silence-qstandardpaths-xdg-runtime-dir-not-set-defaulting-to-tmp-runti
 ENV XDG_RUNTIME_DIR=/tmp
 
-
-
-
 # download google-chrome outside docker container see ./download/download_chrome_driver.txt
+ADD download/google-chrome-stable_current_amd64.deb download/chromedriver.zip /
 
 
-ADD download/google-chrome-stable_current_amd64.deb . 
-# ADD --chown=root:root setting
-ADD download/chromedriver.zip . 
-RUN unzip chromedriver.zip chromedriver -d /usr/local/bin/
-
-# install google-chrome
-RUN apt-get install -yqq ./google-chrome-stable_current_amd64.deb
-
-# save space
-RUN rm google-chrome-stable_current_amd64.deb && \
+RUN unzip chromedriver.zip -d /usr/local/bin/ && \
+    apt-get install -yqq ./google-chrome-stable_current_amd64.deb && \
+    rm google-chrome-stable_current_amd64.deb && \
     rm chromedriver.zip
+
 
 #start systemd
 RUN printf "systemctl start systemd-logind" >> /etc/profile
@@ -186,17 +173,53 @@ RUN printf "systemctl start systemd-logind" >> /etc/profile
 # systemctl status dbus.service
 ## The unit files have no installation config
 # clean up
-RUN apt-get autoremove -y \
-    && apt-get clean -y \
-    && apt-get autoclean -y \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get autoremove -y-y --auto-remove  && \
+    apt-get clean -y && \
+    apt-get autoclean -y && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir -p /optadduser \
+    apt-transport-https \
+    bash \   
+    ca-certificates \
+    curl \    
+    dbus \                   
+    dbus-user-session \
+    dbus-x11 \           
+    fluxbox \ 
+    fonts-liberation \
+    gcc \                   
+    hicolor-icon-theme \
+    htop \       
+    libasound2 \          
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \           
+    libatspi2.0-0 \
+    libc6-dev \     
+    libcanberra-gtk-module  \
+    libcups2 \       
+    libdbus-1-3 \      
+    libdrm2 \                    
+    libgbm1 \     
+    libgl1-mesa-dri \
+    libgtk-3-0 \ 
+    libnspr4 \   
+    libnss3 \            
+    libpango1.0-0 \ 
+    libpulse0 \   
+    libu2f-udev \
+    libv4l-0 \         
+    libvulkan1 \   
+    libwayland-client0 \
+    libxcomposite1 \
+    libxdamage      
+wget \
 
-# copy bootstrap.sh
-RUN mkdir -p /opt
-COPY /bootstrap.sh /opt
+    # copy docker-entrypoint
+    COPY bootstrap.sh docker-dbus-entrypoint.sh  opt/
 
-# copy docker-entrypoint
-COPY docker-dbus-entrypoint.sh /opt
+
+#OLD  copy docker-entrypoint
+#OLD COPY docker-dbus-entrypoint.sh /opt
 
 # add to /home/user/.bashrc
 # https://dw.exitstatus0.com/doku.php?id=wiki:systemd_user_service#troubleshooting
