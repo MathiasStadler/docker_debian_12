@@ -12,6 +12,7 @@
         "prctl",
         "pwait",
         "SCMP",
+        "seccomp",
         "vncviewer"
     ]
 }
