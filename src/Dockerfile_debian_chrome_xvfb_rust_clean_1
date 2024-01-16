@@ -2,33 +2,26 @@
 FROM debian:12.4-slim
 
 SHELL ["/bin/bash","-cx"]
-
 #set root passwd
 RUN echo 'root:root' | chpasswd
-
-
 RUN printf '#!/bin/sh\nexit 0' > /usr/sbin/policy-rc.d
 
-# set user
+#set user
+# define a USER
 # Environment variables for user
-
-ENV PUID='1001' \
-    PGID='1001' \
-    USER='user' 
+ENV PUID='1001'
+ENV PGID='1001'
+ENV USER='user'
 
 # create user $USER
-RUN groupadd --gid "$PGID" "$USER" && \
-    useradd --home-dir /home/$USER --shell /bin/bash --uid "$PUID" --gid "$PGID" "$USER" && \
-    mkdir /home/$USER && chown -R $USER:$USER /home/$USER
-
-# TODO set passwd for $USER
+RUN groupadd --gid "$PGID" "$USER" 
+RUN useradd --home-dir /home/$USER --shell /bin/bash --uid "$PUID" --gid "$PGID" "$USER" 
 # RUN echo $USER | passwd --stdin $USER
-
+RUN mkdir /home/$USER && chown -R $USER:$USER /home/$USER 
 # add $USER to sudo
-RUN mkdir -p /etc/sudoers.d && \
-    echo "user ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/"$USER"  && \
-    chmod 0440 /etc/sudoers.d/"$USER"
-
+RUN mkdir -p /etc/sudoers.d 
+RUN echo "user ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/"$USER" \
+    && chmod 0440 /etc/sudoers.d/"$USER"
 #set dbus for user 
 RUN echo "export XDG_RUNTIME_DIR=/run/user/$(id -u ${USER})" > /home/${USER}/.bashrc && \
     echo "export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"" >> /home/${USER}/.bashrc
@@ -75,24 +68,20 @@ RUN set -eux; \
     ; \
     rm -rf ls ;
 
-# Chrome dependency Instalation \
-# FROM HERE - https://github.com/Dmitry-Ostashev/testcafe-kubernetes-example/blob/main/Dockerfile \
-
-# add chrome
-# FROM HERE
-# https://github.com/mviereck/x11docker/issues/229
-
-# install DBUS
-# FROM HERE
-# https://github.com/mviereck/x11docker/issues/229
-RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests -yqq systemd \
+# install dbus
+RUN apt-get update
+#FROM HERE
+#https://github.com/mviereck/x11docker/issues/229
+RUN apt-get update && apt-get install -yqq systemd \
     systemd-sysv \
     dbus \
     dbus-x11 \
     dbus-user-session \ 
     mesa-utils \
-    mesa-utils-extra \
-    xvfb \
+    mesa-utils-extra 
+
+# x downlaods
+RUN apt-get update && apt-get install -yqq xvfb \
     apt-transport-https \
     adduser \
     x11vnc \
@@ -108,8 +97,11 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     curl \
     wget \
     ca-certificates \
-    unzip \
-    fonts-liberation \
+    unzip 
+
+# Chrome dependency Instalation \
+# FROM HERE - https://github.com/Dmitry-Ostashev/testcafe-kubernetes-example/blob/main/Dockerfile \
+RUN apt-get update && apt-get install -yqq fonts-liberation \
     libasound2 \
     libatk-bridge2.0-0 \
     libatk1.0-0 \
@@ -130,9 +122,14 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     xdg-utils \
     libu2f-udev \
     libvulkan1 \
-    gcc \
-    libv4l-0 \
-    apt-transport-https \
+    gcc 
+
+RUN apt-get update && apt-get install -yqq  libv4l-0 
+
+# add chrome
+# FROM HERE
+# https://github.com/mviereck/x11docker/issues/229
+RUN apt-get update && apt-get install -yqq apt-transport-https \
     ca-certificates \
     locales \
     locales-all \
@@ -142,8 +139,9 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     mesa-utils-extra \
     xpra \
     websockify \
-    upower \
-    libgl1-mesa-dri \
+    upower
+
+RUN apt-get update && apt-get install -yqq libgl1-mesa-dri \
     libpango1.0-0 \
     libpulse0 \
     libv4l-0 \
@@ -151,12 +149,13 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     sssd \
     sssd-dbus \
     unzip
-
+#    libcanberra-gtk
+#    libgl1-mesa-glx
+#  
 
 # Add chrome user
-RUN groupadd -r chrome && useradd -r -g chrome  chrome \
-    && mkdir -p /home/chrome/Downloads && chown -R chrome:chrome /home/chrome
-
+# RUN groupadd -r chrome && useradd -r -g chrome -G audio,video chrome \
+#    && mkdir -p /home/chrome/Downloads && chown -R chrome:chrome /home/chrome
 # for chrome FROM HERE
 # https://stackoverflow.com/questions/71571296/can-i-silence-qstandardpaths-xdg-runtime-dir-not-set-defaulting-to-tmp-runti
 ENV XDG_RUNTIME_DIR=/tmp
@@ -164,8 +163,10 @@ ENV XDG_RUNTIME_DIR=/tmp
 
 
 
-# download google-chrome outside docker container see ./download/download_chrome_driver.txt
-
+# download google-chrome
+# RUN echo $?
+# RUN cd /tmp && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+# RUN curl -vsSLO https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 
 ADD download/google-chrome-stable_current_amd64.deb . 
 # ADD --chown=root:root setting
