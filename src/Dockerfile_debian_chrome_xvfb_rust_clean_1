@@ -264,3 +264,6 @@ ENTRYPOINT ["/opt/docker-dbus-entrypoint.sh"]
 
 # run
 # docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run --device /dev/snd --device /dev/dri -v /dev/shm:/dev/shm debian_chrome_xvfb_rust  bash 
+
+# DBUS_SESSION_BUS_ADDRESS=unix:path=/bus
+# export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1001/bus

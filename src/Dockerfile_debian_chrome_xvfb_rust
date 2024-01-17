@@ -45,7 +45,9 @@ RUN echo "export XDG_RUNTIME_DIR=/run/user/$(id -u ${USER})" > /home/${USER}/.ba
 # install DBUS
 # FROM HERE
 # https://github.com/mviereck/x11docker/issues/229
-RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests -yqq adduser \
+# save
+#RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests -yqq  adduser \
+RUN apt-get update && apt-get install -yqq  adduser \
     apt-transport-https \
     bash \   
     ca-certificates \
@@ -53,14 +55,14 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     dbus \                   
     dbus-user-session \
     dbus-x11 \           
-    fluxbox \ 
+    fluxbox \
     fonts-liberation \
     gcc \                   
     hicolor-icon-theme \
     htop \       
     libasound2 \          
-    libatk-bridge2.0-0 \
     libatk1.0-0 \           
+    libatk-bridge2.0-0 \
     libatspi2.0-0 \
     libc6-dev \     
     libcanberra-gtk-module  \
@@ -80,8 +82,14 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     libwayland-client0 \
     libxcomposite1 \
     libxdamage-dev \
+    sudo \
+    unzip \
+    upower \
+    vim \
     wget \
-    unzip
+    x11-utils \
+    x11vnc \
+    xvfb 
 
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
@@ -162,58 +170,12 @@ RUN chmod +x /opt//docker-dbus-entrypoint.sh
 ENTRYPOINT ["/opt/docker-dbus-entrypoint.sh"]
 # ENTRYPOINT ["/sbin/init"]
 
-
+# this works
 # hier weiter 
 
-# cd systemd
-# docker build -t ubuntu_23_10_xvfb -f Dockerfile_ubuntu_23_10_xvfb "."
-
-# docker build -t ubuntu_23_10_xvfb_dbus -f Dockerfile_ubuntu_23_10_xvfb_dbus "."
-# --progress=plain
-# docker build --progress=plain -t ubuntu_23_10_xvfb_dbus -f Dockerfile_ubuntu_23_10_xvfb_dbus "."
+# build
+# cd src
+# docker build --progress=plain -t debian_chrome_xvfb_rust_4 -f Dockerfile_debian_chrome_xvfb_rust "."
 
 # run
-# docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /var/run/dbus:/var/run/dbus -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run ubuntu_23_10_xvfb
-
-# docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /var/run/dbus:/var/run/dbus -v /run/dbus/system_bus_socket:/run/dbus/system_bus_socket  -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run ubuntu_23_10_xvfb
-
-# /w dbus
-# docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /var/run/dbus:/var/run/dbus -v /run/dbus/system_bus_socket:/run/dbus/system_bus_socket  -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run ubuntu_23_10_xvfb_dbus
-
-# /w /sys/fs/cgroup/unified/docker
-# docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /sys/fs/cgroup/unified/docker:/sys/fs/cgroup/unified/docker -v /var/run/dbus:/var/run/dbus -v /run/dbus/system_bus_socket:/run/dbus/system_bus_socket  -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run ubuntu_23_10_xvfb_dbus
-
-# docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run ubuntu_23_10_xvfb_dbus bash
-
-#  google-chrome-stable --no-sandbox --no-first-run --disable-gpu --enable-logging=stderr -v=3 > log.txt 2>&1
-
-# google-chrome-stable --no-sandbox --no-first-run --disable-gpu --disable-features=dbus --disable-setuid-sandbox  --enable-logging=stderr -v=1 > log.txt 2>&1
-
-
-# next step
-# docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run ubuntu_23_10_xvfb_dbus bash
-
-# next step
-# docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run --device /dev/snd --device /dev/dri -v /dev/shm:/dev/shm ubuntu_23_10_xvfb_dbus bash
-
-# this works
-# docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run --device /dev/snd --device /dev/dri -v /dev/shm:/dev/shm ubuntu_23_10_xvfb_dbus bash 
-
-
-# save
-#  google-chrome-stable --no-sandbox --no-gpu --use-gl=desktop -ozone-plattform=wayland
-
-## debian
-
-# docker build --progress=plain --no-cache  -t Dockerfile_ubuntu_replace_debian  -f Dockerfile_ubuntu_replace_debian "."
-
-# run
-# docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run --device /dev/snd --device /dev/dri -v /dev/shm:/dev/shm ubuntu_replace_debian  bash 
-
-
-#/w rust
-# # cd src
-# docker build --progress=plain --no-cache -t debian_chrome_xvfb_rust -f Dockerfile_debian_chrome_xvfb_rust "."
-
-# run
-# docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run --device /dev/snd --device /dev/dri -v /dev/shm:/dev/shm debian_chrome_xvfb_rust  bash 
+# docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run --device /dev/snd --device /dev/dri -v /dev/shm:/dev/shm debian_chrome_xvfb_rust_4  bash 
