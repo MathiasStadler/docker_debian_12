@@ -33,11 +33,7 @@ RUN mkdir -p /etc/sudoers.d && \
 RUN echo "export XDG_RUNTIME_DIR=/run/user/$(id -u ${USER})" > /home/${USER}/.bashrc && \
     echo "export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"" >> /home/${USER}/.bashrc
 
-
 #-no-install-recommends --no-install-suggests install
-
-
-
 
 # Chrome dependency Instalation \
 # FROM HERE - https://github.com/Dmitry-Ostashev/testcafe-kubernetes-example/blob/main/Dockerfile \
@@ -84,7 +80,8 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     libwayland-client0 \
     libxcomposite1 \
     libxdamage-dev \
-    wget 
+    wget \
+    unzip
 
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
@@ -115,34 +112,6 @@ RUN set -eux; \
     ; \
     rm -rf ls 
 
-#install rust
-
-ENV RUSTUP_HOME=/usr/local/rustup \
-    CARGO_HOME=/usr/local/cargo \
-    PATH=/usr/local/cargo/bin:$PATH \
-    RUST_VERSION=1.74.2
-
-RUN set -eux; \
-    dpkgArch="$(dpkg --print-architecture)"; \
-    case "${dpkgArch##*-}" in \
-    amd64) rustArch='x86_64-unknown-linux-gnu'; rustupSha256='0b2f6c8f85a3d02fde2efc0ced4657869d73fccfce59defb4e8d29233116e6db' ;; \
-    armhf) rustArch='armv7-unknown-linux-gnueabihf'; rustupSha256='f21c44b01678c645d8fbba1e55e4180a01ac5af2d38bcbd14aa665e0d96ed69a' ;; \
-    arm64) rustArch='aarch64-unknown-linux-gnu'; rustupSha256='673e336c81c65e6b16dcdede33f4cc9ed0f08bde1dbe7a935f113605292dc800' ;; \
-    i386) rustArch='i686-unknown-linux-gnu'; rustupSha256='e7b0f47557c1afcd86939b118cbcf7fb95a5d1d917bdd355157b63ca00fc4333' ;; \
-    *) echo >&2 "unsupported architecture: ${dpkgArch}"; exit 1 ;; \
-    esac; \
-    url="https://static.rust-lang.org/rustup/archive/1.26.0/${rustArch}/rustup-init"; \
-    wget "$url"; \
-    echo "${rustupSha256} *rustup-init" | sha256sum -c -; \
-    chmod +x rustup-init; \
-    ./rustup-init -y --no-modify-path --profile minimal --default-toolchain $RUST_VERSION --default-host ${rustArch}; \
-    rm rustup-init; \
-    chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
-    rustup --version; \
-    cargo --version; \
-    rustc --version; \
-    rm -rf ls ;
-
 # Add chrome user
 RUN groupadd -r chrome && \
     useradd -r -g chrome  chrome && \
@@ -170,46 +139,11 @@ RUN printf "systemctl start systemd-logind" >> /etc/profile
 # systemctl status dbus.service
 ## The unit files have no installation config
 # clean up
-RUN apt-get autoremove -y-y --auto-remove  && \
+RUN apt-get autoremove -y --auto-remove  && \
     apt-get clean -y && \
     apt-get autoclean -y && \
     rm -rf /var/lib/apt/lists/* && \
-    mkdir -p /optadduser \
-    apt-transport-https \
-    bash \   
-    ca-certificates \
-    curl \    
-    dbus \                   
-    dbus-user-session \
-    dbus-x11 \           
-    fluxbox \ 
-    fonts-liberation \
-    gcc \                   
-    hicolor-icon-theme \
-    htop \       
-    libasound2 \          
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \           
-    libatspi2.0-0 \
-    libc6-dev \     
-    libcanberra-gtk-module  \
-    libcups2 \       
-    libdbus-1-3 \      
-    libdrm2 \                    
-    libgbm1 \     
-    libgl1-mesa-dri \
-    libgtk-3-0 \ 
-    libnspr4 \   
-    libnss3 \            
-    libpango1.0-0 \ 
-    libpulse0 \   
-    libu2f-udev \
-    libv4l-0 \         
-    libvulkan1 \   
-    libwayland-client0 \
-    libxcomposite1 \
-    libxdamage-dev \      
-    wget 
+    mkdir -p /optadduser 
 
 # copy docker-entrypoint
 COPY bootstrap.sh docker-dbus-entrypoint.sh  opt/
