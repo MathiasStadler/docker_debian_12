@@ -49,6 +49,7 @@ RUN echo "export XDG_RUNTIME_DIR=/run/user/$(id -u ${USER})" > /home/${USER}/.ba
 #RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests -yqq  adduser \
 RUN apt-get update && apt-get install -yqq  adduser \
     apt-transport-https \
+    apt-utils \
     bash \   
     ca-certificates \
     curl \    
@@ -89,7 +90,11 @@ RUN apt-get update && apt-get install -yqq  adduser \
     wget \
     x11-utils \
     x11vnc \
-    xvfb 
+    xvfb \
+    pulsemixer \
+    pulseaudio \
+    pavucontrol \
+    alsa-utils
 
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
@@ -156,6 +161,8 @@ RUN apt-get autoremove -y --auto-remove  && \
 # copy docker-entrypoint
 COPY bootstrap.sh docker-dbus-entrypoint.sh  opt/
 
+# copy start-chrome.sh
+COPY start-chrome.sh /home/${USER}
 
 #OLD  copy docker-entrypoint
 #OLD COPY docker-dbus-entrypoint.sh /opt

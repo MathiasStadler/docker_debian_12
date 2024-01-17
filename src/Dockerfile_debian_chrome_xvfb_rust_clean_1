@@ -267,3 +267,4 @@ ENTRYPOINT ["/opt/docker-dbus-entrypoint.sh"]
 
 # DBUS_SESSION_BUS_ADDRESS=unix:path=/bus
 # export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1001/bus
+# --disable-dev-shm-usage
