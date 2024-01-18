@@ -19,7 +19,8 @@ ENV PUID='1001' \
 # create user $USER
 RUN groupadd --gid "$PGID" "$USER" && \
     useradd --home-dir /home/$USER --shell /bin/bash --uid "$PUID" --gid "$PGID" "$USER" && \
-    mkdir /home/$USER && chown -R $USER:$USER /home/$USER
+    mkdir /home/$USER && chown -R $USER:$USER /home/$USER && \
+    usermod -aG sudo "$USER"
 
 # TODO set passwd for $USER
 # RUN echo $USER | passwd --stdin $USER
