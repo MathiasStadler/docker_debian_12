@@ -91,10 +91,9 @@ RUN apt-get update && apt-get install -yqq  adduser \
     x11-utils \
     x11vnc \
     xvfb \
-    pulsemixer \
     pulseaudio \
-    pavucontrol \
-    alsa-utils
+    pulseaudio-utils \
+    pulsemixer 
 
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
@@ -144,7 +143,6 @@ RUN unzip chromedriver.zip -d /usr/local/bin/ && \
     rm google-chrome-stable_current_amd64.deb && \
     rm chromedriver.zip
 
-
 #start systemd
 RUN printf "systemctl start systemd-logind" >> /etc/profile
 
@@ -186,3 +184,30 @@ ENTRYPOINT ["/opt/docker-dbus-entrypoint.sh"]
 
 # run
 # docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run --device /dev/snd --device /dev/dri -v /dev/shm:/dev/shm debian_chrome_xvfb_rust_4  bash 
+
+
+# sudo docker run -it \
+#     --device /dev/snd \
+#     -e PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native \
+#     -v ${XDG_RUNTIME_DIR}/pulse/native:${XDG_RUNTIME_DIR}/pulse/native \
+#     -v ~/.config/pulse/cookie:/root/.config/pulse/cookie \
+#     --group-add $(getent group audio | cut -d: -f3) \
+#     ubuntu:23.10 /bin/bash
+
+# sudo docker run -it \
+# -v /tmp/.X11-unix:/tmp/.X11-unix \
+# -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+# --cap-add SYS_ADMIN \
+# --security-opt apparmor=unconfined \
+# --tmpfs /run --device /dev/snd \
+# --device /dev/dri -v /dev/shm:/dev/shm \
+# debian_chrome_xvfb_rust_8   bash 
+
+# sudo docker run -it \
+# -v /tmp/.X11-unix:/tmp/.X11-unix \
+# -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+# --cap-add SYS_ADMIN \
+# --security-opt apparmor=unconfined \
+# --tmpfs /run --device /dev/snd \
+# --device /dev/dri -v /dev/shm:/dev/shm \
+# debian_chrome_xvfb_rust_8   bash 
