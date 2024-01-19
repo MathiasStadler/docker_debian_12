@@ -12,8 +12,8 @@ RUN printf '#!/bin/sh\n exit 0' > /usr/sbin/policy-rc.d
 # set user
 # Environment variables for user
 
-ENV PUID='1001' \
-    PGID='1001' \
+ENV PUID='1000' \
+    PGID='1000' \
     USER='user' 
 
 # create user $USER
@@ -181,7 +181,7 @@ ENTRYPOINT ["/opt/docker-dbus-entrypoint.sh"]
 
 # build
 # cd src
-# docker build --progress=plain -t debian_chrome_xvfb_rust_4 -f Dockerfile_debian_chrome_xvfb_rust "."
+# docker build --progress=plain -t debian_chrome_xvfb_rust_10 -f Dockerfile_debian_chrome_xvfb_rust "."
 
 # run
 # docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add SYS_ADMIN --security-opt apparmor=unconfined --tmpfs /run --device /dev/snd --device /dev/dri -v /dev/shm:/dev/shm debian_chrome_xvfb_rust_4  bash 

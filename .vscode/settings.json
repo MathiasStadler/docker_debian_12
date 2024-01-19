@@ -2,6 +2,7 @@
     "cSpell.words": [
         "capget",
         "capset",
+        "chromedriver",
         "creat",
         "epoll",
         "eventfd",
