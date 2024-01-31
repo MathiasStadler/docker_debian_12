@@ -20,7 +20,8 @@ ENV PUID='1000' \
 RUN groupadd --gid "$PGID" "$USER" && \
     useradd --home-dir /home/$USER --shell /bin/bash --uid "$PUID" --gid "$PGID" "$USER" && \
     mkdir /home/$USER && chown -R $USER:$USER /home/$USER && \
-    usermod -aG sudo "$USER"
+    usermod -aG sudo "$USER" && \
+    usermod -aG adm "$USER"
 
 # TODO set passwd for $USER
 # RUN echo $USER | passwd --stdin $USER
@@ -94,7 +95,9 @@ RUN apt-get update && apt-get install -yqq  adduser \
     xvfb \
     pulseaudio \
     pulseaudio-utils \
-    pulsemixer 
+    pulsemixer \
+    pkg-config\
+    libssl-dev
 
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
@@ -149,7 +152,7 @@ RUN printf "systemctl start systemd-logind" >> /etc/profile
 
 # systemctl enable dbus.service
 # systemctl status dbus.service
-## The unit files have no installation config
+## The unit files have no installation configWarning: some journal files were not opened due to insufficient permissions
 # clean up
 RUN apt-get autoremove -y --auto-remove  && \
     apt-get clean -y && \
