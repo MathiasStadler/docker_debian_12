@@ -1,3 +1,5 @@
 **/src/download/chromedriver.zip
 # **/src/download/*
 **/src/download/google-chrome-stable_current_amd64.deb
+**/src/download/chromedriver-linux64/chromedriver
+**/src/download/chromedriver-linux64/LICENSE.chromedriver
